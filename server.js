@@ -11,13 +11,14 @@ const cors = require('cors');
 const app = express();
 
 const corsOptions = {
-    origin: process.env.CLIEN_URL,
+    origin: process.env.CLIENT_URL,
     credentials: true,
     'allowedHeaders': ['sessionId', 'Content-Type'],
     'exposedHeaders': ['sessionId'],
     'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
     'preflightContinue': false
 }
+app.use(express.static('public'));
 app.use(cors(corsOptions));
 
 app.use(express.json());
