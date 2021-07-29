@@ -1,5 +1,6 @@
 const PostModel = require('../models/post.model');
 const UserModel = require('../models/user.model');
+const { uploadErrors } = require("../utils/errors.utils");
 const ObjectID = require('mongoose').Types.ObjectId;
 const fs = require('fs');
 const { promisify } = require('util');
@@ -31,20 +32,20 @@ module.exports.createPost = async (req, res) => {
             return res.status(201).json({ errors });
         }
     
-        const fileName = req.body.posterId + Date.now() +  ".jpg";
+        fileName = req.body.posterId + Date.now() +  ".jpg";
 
         await pipeline(
             req.file.stream,
             fs.createWriteStream(
-                `${__dirname}/../client/public/uploads/posts/${fileName}`
+                `${__dirname}/../public/uploads/posts/${fileName}`
             )
         );
     }
-
+    console.log(fileName);
     const newPost = new PostModel({
         posterId: req.body.posterId,
         message: req.body.message,
-        picture: req.file !== null ? "./uploads/posts/" + fileName : "",
+        picture: req.file !== null ? "/uploads/posts/" + fileName : "",
         video: req.body.video,
         likers: [],
         comments: [],
