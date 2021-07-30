@@ -1,8 +1,8 @@
-const UserModel = require('../models/user.model');
-const ObjectID = require('mongoose').Types.ObjectId;
+const models = require('../models');
 
 module.exports.getAllUsers = async (req, res) => {
-    const users = await UserModel.find().select('-password'); //-password pour ne pas retourner le mot de passe
+    const users = await models.User.findAll({ attributes: {exclude: ['password'] } }) // on ne veut pas retourner le mot de passe
+
     res.status(200).json(users);
 };
 
