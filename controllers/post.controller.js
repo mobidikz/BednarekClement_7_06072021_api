@@ -1,15 +1,12 @@
-const PostModel = require('../models/post.model');
-const UserModel = require('../models/user.model');
-const ObjectID = require('mongoose').Types.ObjectId;
 const fs = require('fs');
 const { promisify } = require('util');
 const pipeline = promisify(require('stream').pipeline);
+const models = require('../models')
 
-module.exports.readPost = (req, res) => {
-    PostModel.find((err, docs) => {
-        if (!err) res.send(docs);
-        else console.log('Error to get data : ' + err);
-    }).sort({ createdAt: -1 }); // Pour prendre du plus récent au plus ancien
+module.exports.readPost = async (req, res) => {
+    const users = await models.User.findAll()
+
+    res.status(200).send(users)
 }
 
 module.exports.createPost = async (req, res) => {

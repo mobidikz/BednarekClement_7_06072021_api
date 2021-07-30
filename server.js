@@ -3,8 +3,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/user.routes');
 const postRoutes = require('./routes/post.routes');
-require("dotenv").config({path: './config/.env'});
-const db = require('./config/db');
+require("dotenv").config();
 const {checkUser, requireAuth} = require("./middleware/auth.middleware");
 const cors = require('cors');
 
@@ -18,6 +17,7 @@ const corsOptions = {
     'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
     'preflightContinue': false
 }
+
 app.use(express.static('public'));
 app.use(cors(corsOptions));
 
