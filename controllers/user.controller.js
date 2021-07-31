@@ -1,115 +1,49 @@
 const models = require('../models');
 
 module.exports.getAllUsers = async (req, res) => {
-    const users = await models.User.findAll({ attributes: {exclude: ['password'] } }) // on ne veut pas retourner le mot de passe
+    const users = await models.User.findAll({ attributes: { exclude: ['password'] } }) // on ne veut pas retourner le mot de passe
 
     res.status(200).json(users);
 };
 
-module.exports.userInfo = (req, res) => {
-    //console.log(req.params);
-    if (!ObjectID.isValid(req.params.id))
-        return res.status(400).send('ID unknown : ' + req.params.id)
+module.exports.userInfo = async (req, res) => {
+    if (!req.params.id)
+        return res.status(400).send('ID unknown')
 
-    UserModel.findById(req.params.id, (err, docs) => {
-       if (!err) res.send(docs);
-       else console.log('ID unknow : " err');
-    }).select('-password');
-};
+    try {
+        const user = await models.User.findByPk(req.params.id, { attributes: {exclude: ['password'] } })
+
+        res.send(user)
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 module.exports.updateUser = async (req, res) => {
-    if (!ObjectID.isValid(req.params.id))
-        return res.status(400).send('ID unknown : ' + req.params.id)
+    if (!req.params.id)
+        return res.status(400).send('ID unknown')
 
     try {
-        await UserModel.findOneAndUpdate(
-            {_id: req.params.id},
-            {
-                $set: {
-                    bio: req.body.bio
-                }
-            },
-            { new: true, upsert: true, setDefaultsOnInsert: true},
-            (err, docs) => {
-                if (!err) return res.send(docs);
-                if(err) return res.status(500).send({ message: err});
-            }
-        )
+        const user = await models.User.findByPk(req.params.id)
+        await user.update({ bio: req.body.bio })
+
+        res.send(user)
     } catch (err) {
-        return res.status(500).json({ message: err});
+        return res.status(500).json({ message: err });
     }
-};
+}
 
 module.exports.deleteUser = async (req, res) => {
-    if (!ObjectID.isValid(req.params.id))
-        return res.status(400).send('ID unknown : ' + req.params.id)
-
-        try {
-            await UserModel.remove({ _id: req.params.id}).exec();
-            res.status(200).json({ message: "Successfully deleted."});
-        } catch (err) {
-            return res.status(500).json({ message: err});
-        }
-};
-
-module.exports.follow = async (req, res) => {
-    if (!ObjectID.isValid(req.params.id) || !ObjectID.isValid(req.body.idToFollow))
-        return res.status(400).send('ID unknown : ' + req.params.id)
-
+    if (!req.params.id)
+        return res.status(400).send('ID unknown')
+    
     try {
-        // add to th follower list
-        await UserModel.findByIdAndUpdate(
-            req.params.id,
-            { $addToSet: { following: req.body.idToFollow}},
-            { new: true, upsert: true},
-            (err, docs) => {
-                if(!err) res.status(201).json(docs);
-                else return res.status(400).json(err);
-            }
-        );
-        //add to following list
-        await UserModel.findByIdAndUpdate(
-            req.body.idToFollow,
-            { $addToSet: { followers: req.params.id}},
-            { new: true, upsert: true},
-            (err, docs) => {
-                //if(!err) response.status(201).json(docs);
-                if (err) return res.status(400).json(err);
-            }
-        )
+        const user = await models.User.findByPk(req.params.id)
+        await models.Post.destroy({ where: { posterId: user.id } }) // la suppression en cascade de Sequelize ne fonctionne pas
+        await user.destroy()
+
+        res.status(200).json({ message: "Successfully deleted."});
     } catch (err) {
-        return res.status(500).json({ message: err});
+        return res.status(500).json({ message: err });
     }
-};
-
-module.exports.unfollow = async (req, res) => {
-    if (!ObjectID.isValid(req.params.id) || !ObjectID.isValid(req.body.idToUnfollow))
-        return res.status(400).send('ID unknown : ' + req.params.id)
-
-    try {
-        // remove from follower list
-        await UserModel.findByIdAndUpdate(
-            req.params.id,
-            { $pull: { following: req.body.idToUnfollow}},
-            { new: true, upsert: true},
-            (err, docs) => {
-                if(!err) res.status(201).json(docs);
-                else return res.status(400).json(err);
-            }
-        );
-        //remove from following list
-        await UserModel.findByIdAndUpdate(
-            req.body.idToUnfollow,
-            { $pull: { followers: req.params.id}},
-            { new: true, upsert: true},
-            (err, docs) => {
-                //if(!err) response.status(201).json(docs);
-                if (err) return res.status(400).json(err);
-            }
-        )
-
-    } catch (err) {
-        return res.status(500).json({ message: err});
-    }
-};
-
+}

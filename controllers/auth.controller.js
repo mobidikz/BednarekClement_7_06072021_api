@@ -1,8 +1,9 @@
 
-const models = require('../models');
-const jwt = require('jsonwebtoken');
-const { signUpErrors, signInErrors } = require("../utils/errors.utils");
-const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+
+const models = require('../models')
+const { signUpErrors, signInErrors } = require("../utils/errors.utils")
 
 const maxAge =  3 * 24 * 60 * 60 * 1000; // = 3 journées en milliseconde 
 

@@ -35,3 +35,8 @@ npx sequelize-cli seed:generate --name demo-user
 ```sh
 npx sequelize-cli db:seed:all
 ```
+
+
+
+
+https://sequelize.org/master/class/lib/model.js~Model.html#static-method-findOne
