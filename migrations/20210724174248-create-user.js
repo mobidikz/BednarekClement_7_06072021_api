@@ -10,15 +10,22 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       picture: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: true
       },
       pseudo: {
         type: Sequelize.STRING,
+        allowNull: false,
         unique: true
       },
       email: {
         type: Sequelize.STRING,
+        allowNull: false,
         unique: true
+      },
+      bio: {
+        type: Sequelize.TEXT,
+        allowNull: true
       },
       password: {
         type: Sequelize.STRING

@@ -1,19 +1,21 @@
 module.exports.signUpErrors = (err) => {
-    let errors = {pseudo: '', email: '', password: 'mauvais password'}
+    const messages = err.errors.map(e => e.message)
 
-    if(err.message.includes('pseudo'))
+    let errors = { pseudo: '', email: '', password: 'mauvais password' }
+
+    if(messages.includes('pseudo'))
     errors.pseudo = "Pseudo incorrect ou déjà pris";
 
-    if(err.message.includes('email'))
+    if(messages.includes('email'))
     errors.email = 'Email incorrect';
 
-    if(err.message.includes('password'))
-    errors.password = 'Le mot de passe de faire 6 caractères minimum';
+    if(messages.includes('password'))
+    errors.password = 'Le mot de passe doit faire 6 caractères minimum';
 
-    if(err.code === 11000 && Object.keys(err.keyValue)[0].includes('pseudo')) // si le code erreur est 11000 et que la clé de l'objet contient "pseudo"
+    if(messages.includes('pseudo must be unique'))
     errors.pseudo = 'Ce pseudo existe déjà';
 
-    if(err.code === 11000 && Object.keys(err.keyValue)[0].includes('email'))
+    if(messages.includes('email must be unique'))
     errors.email = 'Cet email existe déjà';
 
     return errors
@@ -22,10 +24,10 @@ module.exports.signUpErrors = (err) => {
 module.exports.signInErrors = (err) => {
     let errors = { email:'', password:'' }
 
-    if (err.message.includes('email')) 
+    if (err.message === 'incorrect email') 
     errors.email = 'Email inconnu';
 
-    if (err.message.includes('password')) 
+    if (err.message === 'incorrect password') 
     errors.password = 'Mot de passe incorrect';
 
     return errors
