@@ -39,12 +39,14 @@ module.exports.deleteUser = async (req, res) => {
     
     try {
         // la suppression en cascade de Sequelize ne fonctionne pas
-        const posts = await models.Post.findAll({ where: { posterId: req.params.id } })
+        const posts = await models.Post.findAll({ where: { posterId: req.params.id }, attributes: ['id'] })
         const postsIds = posts.map(p => p.id)
     
         await Promise.all([
             models.Like.destroy({ where: { postId: postsIds } }),
-            models.Comment.destroy({ where: { postId: postsIds } })
+            models.Like.destroy({ where: { likerId: req.params.id } }),
+            models.Comment.destroy({ where: { postId: postsIds } }),
+            models.Comment.destroy({ where: { commenterId: req.params.id } })
         ])
     
         await models.Post.destroy({ where: { posterId: req.params.id } })
@@ -54,4 +56,5 @@ module.exports.deleteUser = async (req, res) => {
     } catch (err) {
         return res.status(500).json({ message: err });
     }
+
 }
