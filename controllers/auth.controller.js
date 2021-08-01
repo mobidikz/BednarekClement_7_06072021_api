@@ -17,7 +17,7 @@ module.exports.signUp = async (req, res) => {
     const {pseudo, email, password} = req.body // écrit en destructuring
 
     try {
-        const user = await models.User.create({ pseudo, email, password })
+        const user = await models.User.create({ pseudo, email, password, picture: "uploads/profil/random-user.jpg" })
         res.status(201).json({ user: user.id})
     }
     catch(err) {
