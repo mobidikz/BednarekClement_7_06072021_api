@@ -6,7 +6,9 @@ const models = require('../models')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    if (!models.User.findOne({ where: { email: 'demo@gmail.com' }})) {
+    const user = await models.User.findOne({ where: { email: 'demo@gmail.com' }})
+
+    if (!user) {
       await models.User.create({
         id: 1,
         email: 'demo@gmail.com',
