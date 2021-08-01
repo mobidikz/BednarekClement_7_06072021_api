@@ -38,10 +38,18 @@ module.exports.deleteUser = async (req, res) => {
         return res.status(400).send('ID unknown')
     
     try {
-        const user = await models.User.findByPk(req.params.id)
-        await models.Post.destroy({ where: { posterId: user.id } }) // la suppression en cascade de Sequelize ne fonctionne pas
-        await user.destroy()
-
+        // la suppression en cascade de Sequelize ne fonctionne pas
+        const posts = await models.Post.findAll({ where: { posterId: req.params.id } })
+        const postsIds = posts.map(p => p.id)
+    
+        await Promise.all([
+            models.Like.destroy({ where: { postId: postsIds } }),
+            models.Comment.destroy({ where: { postId: postsIds } })
+        ])
+    
+        await models.Post.destroy({ where: { posterId: req.params.id } })
+        await models.User.destroy({ where: { id: req.params.id } })
+    
         res.status(200).json({ message: "Successfully deleted."});
     } catch (err) {
         return res.status(500).json({ message: err });

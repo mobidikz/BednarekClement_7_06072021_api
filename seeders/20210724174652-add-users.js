@@ -1,11 +1,16 @@
 'use strict';
 
 const faker = require('faker')
+const fs = require('fs');
 
 const models = require('../models')
 
+const testFolder = './public/uploads/profil/';
+
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    const pictures = fs.readdirSync(testFolder)
+
     const user = await models.User.findOne({ where: { email: 'demo@gmail.com' }})
 
     if (!user) {
@@ -13,7 +18,7 @@ module.exports = {
         id: 1,
         email: 'demo@gmail.com',
         password: 'demodemo',
-        picture: faker.image.avatar(),
+        picture: "uploads/profil/" + pictures[Math.floor(Math.random() * pictures.length)],
         pseudo: 'demodemo'
       })
     }
@@ -23,7 +28,7 @@ module.exports = {
       await models.User.create({
         email: faker.internet.email(),
         password: faker.internet.password(),
-        picture: Math.random() > 0.5 ? faker.image.avatar() : null,
+        picture: "uploads/profil/" + pictures[Math.floor(Math.random() * pictures.length)],
         pseudo: faker.internet.userName()
       })
     }

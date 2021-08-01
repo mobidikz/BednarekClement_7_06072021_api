@@ -13,7 +13,7 @@ router.patch('/:id/like', postController.likePost);
 
 //comments
 router.post('/:id/comment', postController.commentPost);
-router.put('/:postId/comments/:id', postController.editCommentPost);
-router.delete('/:postId/comments/:id', postController.deleteCommentPost);
+router.put('/:postId/comment/:id', postController.editCommentPost);
+router.delete('/:postId/comment/:id', postController.deleteCommentPost);
 
 module.exports = router;

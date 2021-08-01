@@ -4,8 +4,8 @@ const pipeline = promisify(require('stream').pipeline);
 const models = require('../models')
 
 module.exports.readPost = async (req, res) => {
-    const posts = await models.Post.findAll(
-        { include: [
+    const posts = await models.Post.findAll({
+        include: [
             {
                 model: models.Comment,
                 as: 'comments',
@@ -23,6 +23,9 @@ module.exports.readPost = async (req, res) => {
                 as: 'likes',
                 attributes: ['likerId']
             }
+        ], 
+        order: [
+            ["createdAt", "DESC"]
         ]
     })
 
@@ -36,25 +39,26 @@ module.exports.createPost = async (req, res) => {
     if (req.file !== null) {
         try {
             if (
+                
                 req.file.detectedMimeType !== "image/jpg" && 
                 req.file.detectedMimeType !== "image/png" && 
                 req.file.detectedMimeType !== "image/jpeg"
                 
             )
                 throw Error('invalid file');
-    
+
             if (req.file.size > 500000) throw Error('max size');
         } catch (err) {
             const errors = uploadErrors(err);
             return res.status(201).json({ errors });
         }
     
-        const fileName = req.body.posterId + Date.now() +  ".jpg";
+        fileName = req.body.posterId + Date.now() +  ".jpg";
 
         await pipeline(
             req.file.stream,
             fs.createWriteStream(
-                `${__dirname}/../client/public/uploads/posts/${fileName}`
+                `${__dirname}/../public/uploads/posts/${fileName}`
             )
         );
     }
@@ -62,7 +66,7 @@ module.exports.createPost = async (req, res) => {
     const newPost = new models.Post({
         posterId: req.body.posterId,
         message: req.body.message,
-        picture: req.file !== null ? "./uploads/posts/" + fileName : "",
+        picture: req.file !== null ? "uploads/posts/" + fileName : "",
         video: req.body.video
     });
 
@@ -128,7 +132,7 @@ module.exports.commentPost = async (req, res) => {
 
     try {
         const post = await models.Post.findByPk(req.params.id)
-        console.log(post)
+
         const comment = await post.createComment({
             commenterId: req.body.commenterId,
             text: req.body.text
