@@ -5,18 +5,25 @@ const models = require('../models')
 
 module.exports.readPost = async (req, res) => {
     const posts = await models.Post.findAll(
-        { include: {
-            model: models.Comment,
-            as: 'comments',
-            attributes: {
-                exclude: ['postId', 'PostId', 'commenterId']
+        { include: [
+            {
+                model: models.Comment,
+                as: 'comments',
+                attributes: {
+                    exclude: ['postId', 'PostId', 'commenterId']
+                },
+                include: {
+                    model: models.User,
+                    as: 'commenter',
+                    attributes: ['id', 'pseudo']
+                }
             },
-            include: {
-                model: models.User,
-                as: 'commenter',
-                attributes: ['id', 'pseudo']
+            {
+                model: models.Like,
+                as: 'likes',
+                attributes: ['likerId']
             }
-        }
+        ]
     })
 
     res.status(200).send(posts)
@@ -94,69 +101,26 @@ module.exports.deletePost = async (req, res) => {
     }  
 };
 
-// module.exports.likePost = async (req, res) => {
-//     if (!ObjectID.isValid(req.params.id)) {
-//         return res.status(400).send('ID unknown : ' + req.params.id);
-//     }
+module.exports.likePost = async (req, res) => {
+    if (!req.params.id)
+        return res.status(400).send('ID unknown')
 
-//     try {
-//         await PostModel.findByIdAndUpdate(
-//             req.params.id,
-//             {
-//                 $addToSet: { likers: req.body.id }
-//             },
-//             { new: true},
-//             (err, docs) => {
-//                 if (err) return res.status(400).send(err)
-//             }
-//         );
-//         await UserModel.findByIdAndUpdate(
-//             req.body.id,
-//             {
-//                 $addToSet: { likes: req.params.id}
-//             },
-//             { new: true },
-//             (err, docs) => {
-//                 if (!err) res.send(docs);
-//                 else return res.status(400).send(err);
-//             }
-//         )
-//     } catch (err) {
-//         return res.status(400).send(err);
-//     }
-// };
+    try {
+        let like = await models.Like.findOne({ where: { postId: req.params.id, likerId: req.body.id } })
 
-// module.exports.unlikePost = async (req, res) => {
-//     if (!ObjectID.isValid(req.params.id)) {
-//         return res.status(400).send('ID unknown : ' + req.params.id);
-//     }
+        if (like) {
+            like.destroy()
 
-//     try {
-//         await PostModel.findByIdAndUpdate(
-//             req.params.id,
-//             {
-//                 $pull: { likers: req.body.id }
-//             },
-//             { new: true},
-//             (err, docs) => {
-//                 if (err) return res.status(400).send(err)
-//             }
-//         );
-//         await UserModel.findByIdAndUpdate(
-//             req.body.id,
-//             {
-//                 $pull: { likes: req.params.id}
-//             },
-//             { new: true },
-//             (err, docs) => {
-//                 if (!err) res.send(docs);
-//                 else return res.status(400).send(err);
-//             }
-//         )
-//     } catch (err) {
-//         return res.status(400).send(err);
-//     }
-// }
+            res.send()
+        } else {
+            like = await models.Like.create({ postId: req.params.id, likerId: req.body.id })
+
+            res.status(201).send(like)
+        }
+    } catch (err) {
+        return res.status(400).send(err);
+    }
+};
 
 module.exports.commentPost = async (req, res) => {
     if (!req.params.id)
