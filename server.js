@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 const userRoutes = require('./routes/user.routes');
 const postRoutes = require('./routes/post.routes');
 require("dotenv").config();
-const {checkUser, requireAuth} = require("./middleware/auth.middleware");
+const { checkUser, requireAuth } = require("./middleware/auth.middleware");
 const cors = require('cors');
 
 const app = express();
@@ -26,10 +26,10 @@ app.use(bodyParser.json()); //bodyPerser est peut-être rayé car bodyParser est
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
 
-//jwt
+// jwt
 app.get('*', checkUser);
 app.get('/jwtid', requireAuth, (req, res) => {
-    res.status(200).send(res.locals.user._id)
+    res.status(200).send(res.locals.user.id)
 });
 
 //routes

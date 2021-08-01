@@ -6,6 +6,12 @@ Ce projet contient l'API, elle est basée sur Node.js, Express, Sequelize et SQL
 
 1. cloner le dépôt
 2. installer les dépendance avec `npm i`
+3. créer un fichier .env à la racine du projet et y ajouter les variables d'environnement suivantes:
+```sh
+PORT=5000
+CLIENT_URL=http://localhost:3000
+TOKEN_SECRET=ftnuyby354344hhfttff
+```
 
 ## Mémoire
 
