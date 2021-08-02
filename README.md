@@ -18,7 +18,7 @@ npx sequelize-cli db:migrate
 ```
 5. Créer les faux ulisateurs avec la commande suivante :
 ```sh
-npx sequelize-cli seed:generate --name demo-user
+npx sequelize-cli db:seed:all
 ```
 5. Lancer l'api avec la commande suivante :
 ```sh
