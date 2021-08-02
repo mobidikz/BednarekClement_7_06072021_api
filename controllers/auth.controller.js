@@ -1,7 +1,9 @@
 
-const UserModel = require("../models/user.model");
-const jwt = require('jsonwebtoken');
-const { signUpErrors, signInErrors } = require("../utils/errors.utils");
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+
+const models = require('../models')
+const { signUpErrors, signInErrors } = require("../utils/errors.utils")
 
 const maxAge =  3 * 24 * 60 * 60 * 1000; // = 3 journées en milliseconde 
 
@@ -12,12 +14,11 @@ const createToken = (id) => {
 };
 
 module.exports.signUp = async (req, res) => {
-    console.log(req.body);
     const {pseudo, email, password} = req.body // écrit en destructuring
 
     try {
-        const user = await UserModel.create({pseudo, email, password});
-        res.status(201).json({ user: user._id})
+        const user = await models.User.create({ pseudo, email, password, picture: "uploads/profil/random-user.jpg" })
+        res.status(201).json({ user: user.id})
     }
     catch(err) {
         const errors = signUpErrors(err);
@@ -26,15 +27,25 @@ module.exports.signUp = async (req, res) => {
 }
 
 module.exports.signIn = async (req, res) => {
-    console.log(req.body);
     const { email, password } = req.body
 
     try {
-        const user = await UserModel.login(email, password);
-        const token = createToken(user._id);
-        console.log(token);
+        const user = await models.User.findOne({ where: { email } });
+
+        if (!user) {
+            throw Error('incorrect email')
+        }
+
+        const auth = await bcrypt.compare(password, user.password);
+
+
+        if (!auth) {
+            throw Error('incorrect password');
+        }
+
+        const token = createToken(user.id);
         res.cookie('jwt', token, { httpOnly : true, maxAge });
-        res.status(200).json({user: user._id})
+        res.status(200).json({user: user.id})
     } catch (err){
         const errors = signInErrors(err);
         res.status(200).json({ errors });
