@@ -12,6 +12,19 @@ PORT=5000
 CLIENT_URL=http://localhost:3000
 TOKEN_SECRET=ftnuyby354344hhfttff
 ```
+4. Créer la base de donnée avec la commande suivante :
+```sh
+npx sequelize-cli db:migrate
+```
+5. Créer les faux ulisateurs avec la commande suivante :
+```sh
+npx sequelize-cli seed:generate --name demo-user
+```
+5. Lancer l'api avec la commande suivante :
+```sh
+npm start
+```
+
 
 ## Mémoire
 
