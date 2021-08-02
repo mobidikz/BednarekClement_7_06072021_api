@@ -56,20 +56,9 @@ module.exports.createPost = async (req, res) => {
         }
     
         // Renommer le fichier
-
-        const MIME_TYPES = {
-            "image/jpg": "jpg",
-            "image/jpeg": "jpg",
-            "image/gif": "gif",
-            "image/png": "png"
-        };
-
-        const extension = MIME_TYPES[req.file.mimetype];
-
-        fileName = req.body.posterId + Date.now() + "." +extension;
-
-        console.log(fileName);
-
+        let extension =  req.file.detectedMimeType.split('/').pop();
+        fileName = req.body.posterId + Date.now() + "." + extension;
+        
         await pipeline(
             req.file.stream,
             fs.createWriteStream(

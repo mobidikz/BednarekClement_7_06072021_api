@@ -4,6 +4,8 @@ const { promisify } = require('util');
 const pipeline = promisify(require('stream').pipeline);
 const { uploadErrors } = require("../utils/errors.utils");
 
+
+
 module.exports.uploadProfil = async (req, res) => {
     try {
         if (
@@ -19,18 +21,13 @@ module.exports.uploadProfil = async (req, res) => {
         const errors = uploadErrors(err);
         return res.status(201).json({ errors });
     }
-// Renommer le fichier
 
-    const MIME_TYPES = {
-        "image/jpg": "jpg",
-        "image/jpeg": "jpg",
-        "image/gif": "gif",
-        "image/png": "png"
-    };
+    // Renommer le fichier
+    let extension =  req.file.detectedMimeType.split('/').pop();
+    fileName = req.body.name + Date.now() + "." + extension;
 
-    const extension = MIME_TYPES[req.file.mimetype];
-
-    const fileName = req.body.name + "." + extension;
+    console.log(fileName);
+    
 
     await pipeline(
         req.file.stream,
@@ -40,8 +37,10 @@ module.exports.uploadProfil = async (req, res) => {
     );
 
     try {
-        const user = models.User.findByPk(req.body.userId)
-        const updatedUser = user.update({ picture: `uploads/profil/${fileName}` })
+        console.log(fileName);
+        const user = await models.User.findByPk(req.body.userId)
+        user.changed('updatedAt', true)
+        const updatedUser = await user.update({ picture: `uploads/profil/${fileName}` })
 
         return res.send(updatedUser);
     } catch (err) {
