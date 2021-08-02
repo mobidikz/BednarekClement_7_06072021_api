@@ -2,6 +2,7 @@ const fs = require('fs');
 const { promisify } = require('util');
 const pipeline = promisify(require('stream').pipeline);
 const models = require('../models')
+const { uploadErrors } = require("../utils/errors.utils");
 
 module.exports.readPost = async (req, res) => {
     const posts = await models.Post.findAll({
@@ -42,6 +43,7 @@ module.exports.createPost = async (req, res) => {
                 
                 req.file.detectedMimeType !== "image/jpg" && 
                 req.file.detectedMimeType !== "image/png" && 
+                req.file.detectedMimeType !== "image/gif" && 
                 req.file.detectedMimeType !== "image/jpeg"
                 
             )
@@ -53,7 +55,20 @@ module.exports.createPost = async (req, res) => {
             return res.status(201).json({ errors });
         }
     
-        fileName = req.body.posterId + Date.now() +  ".jpg";
+        // Renommer le fichier
+
+        const MIME_TYPES = {
+            "image/jpg": "jpg",
+            "image/jpeg": "jpg",
+            "image/gif": "gif",
+            "image/png": "png"
+        };
+
+        const extension = MIME_TYPES[req.file.mimetype];
+
+        fileName = req.body.posterId + Date.now() + "." +extension;
+
+        console.log(fileName);
 
         await pipeline(
             req.file.stream,

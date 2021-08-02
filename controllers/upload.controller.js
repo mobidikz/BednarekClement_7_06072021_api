@@ -9,6 +9,7 @@ module.exports.uploadProfil = async (req, res) => {
         if (
             req.file.detectedMimeType !== "image/jpg" && 
             req.file.detectedMimeType !== "image/png" && 
+            req.file.detectedMimeType !== "image/gif" && 
             req.file.detectedMimeType !== "image/jpeg"
         )
             throw Error('invalid file');
@@ -18,8 +19,18 @@ module.exports.uploadProfil = async (req, res) => {
         const errors = uploadErrors(err);
         return res.status(201).json({ errors });
     }
+// Renommer le fichier
 
-    const fileName = req.body.name + ".jpg";
+    const MIME_TYPES = {
+        "image/jpg": "jpg",
+        "image/jpeg": "jpg",
+        "image/gif": "gif",
+        "image/png": "png"
+    };
+
+    const extension = MIME_TYPES[req.file.mimetype];
+
+    const fileName = req.body.name + "." + extension;
 
     await pipeline(
         req.file.stream,
