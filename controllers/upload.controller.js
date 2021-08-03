@@ -39,7 +39,7 @@ module.exports.uploadProfil = async (req, res) => {
     try {
         console.log(fileName);
         const user = await models.User.findByPk(req.body.userId)
-        user.changed('updatedAt', true)
+        // user.changed('updatedAt', true)
         const updatedUser = await user.update({ picture: `uploads/profil/${fileName}` })
 
         return res.send(updatedUser);
