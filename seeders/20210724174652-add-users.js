@@ -2,7 +2,7 @@
 
 const faker = require('faker')
 const fs = require('fs');
-
+require("dotenv").config();
 const models = require('../models')
 
 const testFolder = './public/uploads/profil/';
