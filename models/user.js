@@ -32,6 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         beforeCreate: async (user, options) => {
           const salt = await bcrypt.genSalt();
           user.password = await bcrypt.hash(user.password, salt);
+          user.email = await bcrypt.hash(user.email, process.env.HASH_KEY);
         }
       },
       sequelize,

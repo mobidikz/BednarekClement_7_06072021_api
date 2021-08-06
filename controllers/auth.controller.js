@@ -30,7 +30,8 @@ module.exports.signIn = async (req, res) => {
     const { email, password } = req.body
 
     try {
-        const user = await models.User.findOne({ where: { email } });
+        const hashEmail = await bcrypt.hash(email, process.env.HASH_KEY);
+        const user = await models.User.findOne({ where: { email: hashEmail } });
 
         if (!user) {
             throw Error('incorrect email')

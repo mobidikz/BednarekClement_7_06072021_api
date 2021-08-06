@@ -11,6 +11,7 @@ Ce projet contient l'API, elle est basée sur Node.js, Express, Sequelize et SQL
 PORT=5000
 CLIENT_URL=http://localhost:3000
 TOKEN_SECRET=ftnuyby354344hhfttff
+HASH_KEY=$2b$10$bbdzEQ.Ml0.FB9Znj5PHkO
 ```
 4. Créer la base de donnée avec la commande suivante :
 ```sh
