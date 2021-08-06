@@ -17,10 +17,15 @@ module.exports.signUp = async (req, res) => {
     const {pseudo, email, password} = req.body // écrit en destructuring
 
     try {
+        if (password.length < 6) {
+            const err = new Error();
+            err.errors = [{message: 'password'}]
+            throw err
+        }
+
         const user = await models.User.create({ pseudo, email, password, picture: "uploads/profil/random-user.jpg" })
         res.status(201).json({ user: user.id})
-    }
-    catch(err) {
+    } catch (err) {
         const errors = signUpErrors(err);
         res.status(200).send({ errors })
     }
